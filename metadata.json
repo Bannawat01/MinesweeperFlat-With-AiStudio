@@ -1,0 +1,5 @@
+{
+  "name": "MinesweeperFlat with AI Studio",
+  "description": "A modern, flat-design interpretation of the classic Minesweeper game featuring multiple difficulty levels, first-click safety, and responsive gameplay.",
+  "requestFramePermissions": []
+}
