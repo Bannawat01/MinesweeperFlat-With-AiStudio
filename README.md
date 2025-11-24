@@ -3,11 +3,20 @@
 
   # 💣 AI Studio: Minesweeper CS
 
+  <h3>🌐 Live Demo Link:</h3>
   <a href="https://mine-sweeper-cs.netlify.app/">
-    <img src="https://img.shields.io/badge/DEMO-Play%20Now-success?style=for-the-badge&logo=netlify&logoColor=white" alt="Play Now" height="40"/>
+    <h2>https://mine-sweeper-cs.netlify.app/</h2>
+  </a>
+  
+  <p>
+    Click the link above to play or use the buttons below.
+  </p>
+
+  <a href="https://mine-sweeper-cs.netlify.app/">
+    <img src="https://img.shields.io/badge/PLAY_NOW-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" alt="Play Now" height="40"/>
   </a>
   <a href="https://ai.studio/apps/drive/14xcNarQb8ZIhaily4K0NA6_GcqSEDytI">
-    <img src="https://img.shields.io/badge/AI_Studio-View_Project-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="View in AI Studio" height="40"/>
+    <img src="https://img.shields.io/badge/View_in_AI_Studio-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="View in AI Studio" height="40"/>
   </a>
 
   <br/><br/>
@@ -16,21 +25,16 @@
   ![Gemini API](https://img.shields.io/badge/Gemini-API-8E75B2?style=flat&logo=google-gemini&logoColor=white)
   ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
-  <p>
-    <b>Run and deploy your AI Studio app locally with ease.</b><br>
-    This repository contains everything you need to launch the application.
-  </p>
 </div>
 
 ---
 
-## 🚀 Quick Start (Run Locally)
+## 🚀 Run Locally
 
-Follow these steps to get the project running on your local machine.
+This contains everything you need to run your app locally.
 
-**Prerequisites:** Make sure you have [Node.js](https://nodejs.org/) installed.
+**Prerequisites:**  [Node.js](https://nodejs.org/)
 
-### 1. Install Dependencies
-Install the required packages using npm:
+### 1. Install dependencies
 ```bash
 npm install
