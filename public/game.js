@@ -281,7 +281,7 @@ const Game = {
             AudioSys.win();
             el.reset.textContent = '🥳';
             el.modalTitle.textContent = "Victory!";
-            el.modalTitle.style.color = "green";
+            el.modalTitle.style.color = "var(--color-2)";
             el.modalMsg.textContent = `Time: ${State.timer}s`;
             // Flag remaining mines
             State.grid.forEach(row => row.forEach(cell => {
@@ -307,7 +307,7 @@ const Game = {
             AudioSys.explode();
             el.reset.textContent = '😵';
             el.modalTitle.textContent = "Game Over";
-            el.modalTitle.style.color = "red";
+            el.modalTitle.style.color = "var(--mine-bg)";
             el.modalMsg.textContent = "You hit a mine!";
             
             // Reveal Mines
@@ -366,11 +366,14 @@ const Leaderboard = {
 const UI = {
     renderAuth() {
         if (State.user) {
+            // Calculate current streak for badge based on selected difficulty
+            const currentStreak = State.user.streaks[State.difficulty] || 0;
+            
             el.auth.innerHTML = `
                 <div class="user-profile">
                     <span>${State.user.displayName}</span>
-                    <span class="streak-badge" title="Current Easy Streak">🔥 ${State.user.streaks.easy}</span>
-                    <a href="/api/logout" class="auth-btn" style="background:#ef4444; font-size:0.8rem;">Logout</a>
+                    <span class="streak-badge" title="Current Streak on ${State.difficulty}">🔥 ${currentStreak}</span>
+                    <a href="/api/logout" class="logout-link">Logout</a>
                 </div>
             `;
         } else {
@@ -384,7 +387,13 @@ const UI = {
     
     initListeners() {
         el.reset.onclick = Game.init;
-        el.diff.onchange = () => { el.diff.blur(); Game.init(); };
+        el.diff.onchange = () => { 
+            el.diff.blur(); 
+            // Update difficulty in state and re-render auth to show correct streak badge
+            State.difficulty = el.diff.value;
+            UI.renderAuth();
+            Game.init(); 
+        };
         el.theme.onchange = (e) => {
             const t = e.target.value;
             t === 'light' ? document.documentElement.removeAttribute('data-theme') : document.documentElement.setAttribute('data-theme', t);
@@ -392,7 +401,7 @@ const UI = {
         };
         document.getElementById('leaderboard-btn').onclick = () => {
             el.lbModal.style.display = 'flex';
-            Leaderboard.load('easy');
+            Leaderboard.load(State.difficulty); // Load current difficulty by default
         };
     }
 };
