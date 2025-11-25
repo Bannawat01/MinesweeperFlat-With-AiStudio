@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper - Full Stack</title>
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --cell-size: 28px;
+            --border-width: 3px;
+            
+            /* Light Theme (Default) */
+            --bg-body: #e5e7eb;
+            --bg-panel: #f3f4f6;
+            --bg-board: #bdbdbd;
+            --cell-covered: #c0c0c0;
+            --cell-revealed: #e0e0e0;
+            --border-light: #ffffff;
+            --border-dark: #7b7b7b;
+            --text-main: #1f2937;
+            --mine-bg: #ef4444;
+            --flag-color: #dc2626;
+
+            /* Numbers */
+            --color-1: #0000ff; --color-2: #008000; --color-3: #ff0000;
+            --color-4: #000080; --color-5: #800000; --color-6: #008080;
+            --color-7: #000000; --color-8: #808080;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-board: #334155;
+            --cell-covered: #475569;
+            --cell-revealed: #1e293b;
+            --border-light: #64748b;
+            --border-dark: #0f172a;
+            --text-main: #f1f5f9;
+            --mine-bg: #dc2626;
+            --flag-color: #f87171;
+            --color-1: #60a5fa; --color-2: #4ade80; --color-3: #f87171;
+            --color-4: #818cf8; --color-5: #fb923c; --color-6: #2dd4bf;
+        }
+
+        [data-theme="christmas"] {
+            --bg-body: #022c22;
+            --bg-panel: #7f1d1d;
+            --bg-board: #065f46;
+            --cell-covered: #b91c1c;
+            --cell-revealed: #f0fdf4;
+            --border-light: #fca5a5;
+            --border-dark: #450a0a;
+            --text-main: #fef3c7;
+            --mine-bg: #000000;
+            --flag-color: #fbbf24;
+            --color-1: #166534; --color-2: #991b1b; --color-3: #1e40af;
+        }
+
+        /* --- LAYOUT --- */
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh; width: 100vw;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* TOOLBAR */
+        .app-toolbar {
+            background-color: var(--bg-panel);
+            border-bottom: 4px solid var(--border-dark);
+            padding: 10px 20px;
+            display: flex; flex-wrap: wrap; gap: 15px;
+            align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .toolbar-group {
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        select, button.control-btn {
+            padding: 8px 12px; border-radius: 6px;
+            border: 2px solid var(--border-dark);
+            background: var(--cell-revealed); color: var(--text-main);
+            font-weight: 600; cursor: pointer; outline: none;
+        }
+
+        .stats-panel {
+            background-color: var(--bg-board);
+            padding: 4px 10px; border: 3px solid;
+            border-color: var(--border-dark) var(--border-light) var(--border-light) var(--border-dark);
+            display: flex; gap: 10px; align-items: center; border-radius: 4px;
+        }
+
+        .lcd-display {
+            background-color: #000; color: #ef4444;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 22px; font-weight: bold;
+            padding: 2px 8px; min-width: 50px; text-align: right;
+            border: 2px solid #555;
+        }
+
+        #reset-btn {
+            width: 40px; height: 40px; font-size: 22px;
+            border: 3px solid;
+            border-color: var(--border-light) var(--border-dark) var(--border-dark) var(--border-light);
+            background-color: var(--cell-covered);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        #reset-btn:active {
+            border-color: var(--border-dark) var(--border-light) var(--border-light) var(--border-dark);
+            background-color: var(--cell-revealed);
+        }
+
+        /* --- AUTH & LEADERBOARD UI --- */
+        .auth-btn {
+            background-color: #4285F4; color: white; border: none;
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none; padding: 8px 12px; border-radius: 4px; font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .auth-btn:hover { background-color: #357ae8; }
+        
+        .user-profile {
+            display: flex; align-items: center; gap: 10px; font-weight: bold;
+        }
+        .streak-badge {
+            font-size: 0.8rem; background: var(--mine-bg); color: white; padding: 2px 6px; border-radius: 4px;
+        }
+
+        /* --- GAME BOARD --- */
+        .game-area {
+            flex: 1; overflow: auto; display: flex; position: relative; padding: 20px;
+        }
+        .board-container {
+            margin: auto; padding: 10px; background-color: var(--bg-board);
+            border: 4px solid; border-color: var(--border-light) var(--border-dark) var(--border-dark) var(--border-light);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .board-grid { display: grid; }
+
+        .cell {
+            width: var(--cell-size); height: var(--cell-size);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: calc(var(--cell-size) * 0.6);
+            cursor: default; box-sizing: border-box;
+        }
+        .cell.covered {
+            background-color: var(--cell-covered);
+            border-top: var(--border-width) solid var(--border-light);
+            border-left: var(--border-width) solid var(--border-light);
+            border-right: var(--border-width) solid var(--border-dark);
+            border-bottom: var(--border-width) solid var(--border-dark);
+        }
+        .cell.revealed {
+            background-color: var(--cell-revealed);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .cell.mine { background-color: var(--cell-revealed); }
+        .cell.mine-hit { background-color: var(--mine-bg) !important; }
+        .cell.flagged { color: var(--flag-color); }
+
+        /* Numbers */
+        .val-1 { color: var(--color-1); } .val-2 { color: var(--color-2); }
+        .val-3 { color: var(--color-3); } .val-4 { color: var(--color-4); }
+        .val-5 { color: var(--color-5); } .val-6 { color: var(--color-6); }
+        .val-7 { color: var(--color-7); } .val-8 { color: var(--color-8); }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); display: none;
+            align-items: center; justify-content: center; z-index: 100;
+            backdrop-filter: blur(2px);
+        }
+        .modal {
+            background: var(--bg-panel); padding: 25px; border-radius: 8px;
+            border: 2px solid var(--border-light); text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 90%; max-width: 400px;
+        }
+        .modal h2 { margin-top: 0; color: var(--text-main); }
+        
+        .leaderboard-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 8px; border-bottom: 1px solid var(--border-dark); text-align: left;
+        }
+        .leaderboard-table th { background: rgba(0,0,0,0.1); }
+        .tab-btn {
+            background: none; border: none; padding: 10px; cursor: pointer; color: var(--text-main);
+            border-bottom: 2px solid transparent; font-weight: bold;
+        }
+        .tab-btn.active { border-bottom: 2px solid var(--mine-bg); }
+
+    </style>
+</head>
+<body>
+
+    <!-- TOOLBAR -->
+    <header class="app-toolbar">
+        <div class="toolbar-group">
+            <h1>Minesweeper</h1>
+            
+            <select id="difficulty-select">
+                <option value="easy">Easy (9x9)</option>
+                <option value="medium">Medium (16x16)</option>
+                <option value="hard">Hard (30x16)</option>
+            </select>
+
+            <button class="control-btn" id="leaderboard-btn">🏆 Rank</button>
+            <select id="theme-select">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="christmas">Xmas</option>
+            </select>
+        </div>
+
+        <div class="toolbar-group">
+            <!-- Auth Section -->
+            <div id="auth-section">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="stats-panel">
+                <div id="mine-counter" class="lcd-display">010</div>
+                <button id="reset-btn">😎</button>
+                <div id="timer-display" class="lcd-display">000</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- GAME AREA -->
+    <main class="game-area">
+        <div class="board-container">
+            <div id="game-board" class="board-grid"></div>
+        </div>
+    </main>
+
+    <!-- GAME OVER MODAL -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-title">Game Over</h2>
+            <p id="modal-msg">Status text</p>
+            <div id="streak-update-msg" style="margin-bottom:15px; font-weight:bold; color:var(--color-2);"></div>
+            <button class="control-btn" onclick="Game.init()">Play Again</button>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD MODAL -->
+    <div id="lb-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2>Leaderboard (Highest Streaks)</h2>
+            <div>
+                <button class="tab-btn active" onclick="Leaderboard.load('easy', this)">Easy</button>
+                <button class="tab-btn" onclick="Leaderboard.load('medium', this)">Medium</button>
+                <button class="tab-btn" onclick="Leaderboard.load('hard', this)">Hard</button>
+            </div>
+            <table class="leaderboard-table">
+                <thead><tr><th>#</th><th>Player</th><th>Streak</th></tr></thead>
+                <tbody id="lb-body">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+            <button class="control-btn" onclick="document.getElementById('lb-modal-overlay').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

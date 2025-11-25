@@ -1,22 +1,24 @@
+
 {
-  "name": "minesweeperflat-with-ai-studio",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "minesweeper-fullstack",
+  "version": "1.0.0",
+  "description": "Minesweeper with MERN Stack and Google OAuth",
+  "main": "backend/server.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
   },
   "dependencies": {
-    "lucide-react": "^0.554.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "body-parser": "^1.20.2",
+    "cookie-session": "^2.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "passport": "^0.6.0",
+    "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "nodemon": "^3.0.1"
   }
 }
